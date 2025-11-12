@@ -45,8 +45,12 @@ func main() {
 			if firstArg == "1" {
 				os.Exit(1)
 			}
+		} else if cmd == "echo" {
+			fmt.Print(firstArg + "\n")
+		} else {
+
+			fmt.Println(cmd + ": command not found")
 		}
-		fmt.Println(cmd + ": command not found")
 
 	}
 }
