@@ -11,12 +11,19 @@ var _ = fmt.Fprint
 var _ = os.Stdout
 
 func main() {
-	fmt.Fprint(os.Stdout, "$ ")
-	command, error := bufio.NewReader(os.Stdin).ReadString('\n')
-	if error != nil {
-		panic(error)
-	}
-	cmd := command[:len(command)-1]
 
-	fmt.Println(cmd + ": command not found")
+	for {
+		fmt.Fprint(os.Stdout, "$ ")
+
+		command, error := bufio.NewReader(os.Stdin).ReadString('\n')
+		if error != nil {
+			panic(error)
+		}
+		cmd := command[:len(command)-1]
+		if cmd == "exit" {
+			break
+		}
+		fmt.Println(cmd + ": command not found")
+
+	}
 }
