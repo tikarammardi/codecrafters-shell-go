@@ -13,11 +13,14 @@ var _ = os.Stdout
 func main() {
 
 	for {
-		fmt.Fprint(os.Stdout, "$ ")
+		_, err := fmt.Fprint(os.Stdout, "$ ")
+		if err != nil {
+			return
+		}
 
-		command, error := bufio.NewReader(os.Stdin).ReadString('\n')
-		if error != nil {
-			panic(error)
+		command, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		if err != nil {
+			panic(err)
 		}
 		cmd := command[:len(command)-1]
 		if cmd == "exit" {
