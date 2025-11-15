@@ -4,15 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 )
 
 // Ensures gofmt doesn't remove the "fmt" and "os" imports in stage 1 (feel free to remove this!)
-var _ = fmt.Fprint
-var _ = os.Stdout
+var (
+	_ = fmt.Fprint
+	_ = os.Stdout
+)
 
 func main() {
-
 	for {
 		_, err := fmt.Fprint(os.Stdout, "$ ")
 		if err != nil {
@@ -38,6 +40,10 @@ func main() {
 			firstArg = ""
 		}
 
+		commandList := []string{"echo", "exit", "type"}
+
+		isCommandInList := slices.Contains(commandList, firstArg)
+
 		if cmd == "exit" {
 			if firstArg == "0" {
 				os.Exit(0)
@@ -47,10 +53,14 @@ func main() {
 			}
 		} else if cmd == "echo" {
 			fmt.Print(firstArg + "\n")
+		} else if cmd == "type" {
+			if isCommandInList {
+				fmt.Println(firstArg + " is a shell builtin")
+			} else {
+				fmt.Println(firstArg + ": not found")
+			}
 		} else {
-
 			fmt.Println(cmd + ": command not found")
 		}
-
 	}
 }
