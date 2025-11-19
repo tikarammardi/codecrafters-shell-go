@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"slices"
 	"strings"
 )
@@ -40,9 +41,9 @@ func main() {
 			firstArg = ""
 		}
 
-		commandList := []string{"echo", "exit", "type"}
+		builtIncommandList := []string{"echo", "exit", "type"}
 
-		isCommandInList := slices.Contains(commandList, firstArg)
+		isBuiltInCommandInList := slices.Contains(builtIncommandList, firstArg)
 
 		if cmd == "exit" {
 			if firstArg == "0" {
@@ -54,7 +55,9 @@ func main() {
 		} else if cmd == "echo" {
 			fmt.Print(firstArg + "\n")
 		} else if cmd == "type" {
-			if isCommandInList {
+			if isBuiltInCommandInList {
+				fmt.Println(firstArg + " is a shell builtin")
+			} else if isCommandExecutableInPath(firstArg) {
 				fmt.Println(firstArg + " is a shell builtin")
 			} else {
 				fmt.Println(firstArg + ": not found")
@@ -63,4 +66,18 @@ func main() {
 			fmt.Println(cmd + ": command not found")
 		}
 	}
+}
+
+func isExecutable(path string) (bool, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+	mode := info.Mode()
+	return mode&0o111 != 0, nil
+}
+
+func isCommandExecutableInPath(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
 }
