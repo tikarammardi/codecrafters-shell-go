@@ -57,8 +57,8 @@ func main() {
 		} else if cmd == "type" {
 			if isBuiltInCommandInList {
 				fmt.Println(firstArg + " is a shell builtin")
-			} else if isCommandExecutableInPath(firstArg) {
-				fmt.Println(firstArg + " is a shell builtin")
+			} else if path, ok := isCommandExecutableInPath(firstArg); ok {
+				fmt.Println(firstArg + " is " + path)
 			} else {
 				fmt.Println(firstArg + ": not found")
 			}
@@ -68,16 +68,10 @@ func main() {
 	}
 }
 
-func isExecutable(path string) (bool, error) {
-	info, err := os.Stat(path)
+func isCommandExecutableInPath(cmd string) (string, bool) {
+	path, err := exec.LookPath(cmd)
 	if err != nil {
-		return false, err
+		return "", false
 	}
-	mode := info.Mode()
-	return mode&0o111 != 0, nil
-}
-
-func isCommandExecutableInPath(cmd string) bool {
-	_, err := exec.LookPath(cmd)
-	return err == nil
+	return path, true
 }
