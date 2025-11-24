@@ -27,34 +27,35 @@ func main() {
 			panic(err)
 		}
 		input := command[:len(command)-1]
-
-		parts := strings.SplitN(input, " ", 2)
+		parts := strings.Split(input, " ")
 
 		cmd := parts[0]
 		args := parts[1:]
 
 		var firstArg string
 
-		if len(args) != 0 {
-			firstArg = args[0]
-		} else {
-			firstArg = ""
-		}
-
 		builtIncommandList := []string{"echo", "exit", "type"}
 
-		isBuiltInCommandInList := slices.Contains(builtIncommandList, firstArg)
-
 		if cmd == "exit" {
+
+			if len(args) != 0 {
+				firstArg = args[0]
+			} else {
+				firstArg = ""
+			}
+
 			if firstArg == "0" {
 				os.Exit(0)
 			}
 			if firstArg == "1" {
 				os.Exit(1)
 			}
+			os.Exit(0)
 		} else if cmd == "echo" {
-			fmt.Print(firstArg + "\n")
+			fmt.Print(strings.Join(args, " ") + "\n")
 		} else if cmd == "type" {
+			firstArg = args[0]
+			isBuiltInCommandInList := slices.Contains(builtIncommandList, firstArg)
 			if isBuiltInCommandInList {
 				fmt.Println(firstArg + " is a shell builtin")
 			} else if path, ok := isCommandExecutableInPath(firstArg); ok {
@@ -62,8 +63,14 @@ func main() {
 			} else {
 				fmt.Println(firstArg + ": not found")
 			}
+
 		} else {
-			fmt.Println(cmd + ": command not found")
+
+			err := executeCommand(cmd, args)
+			if err != nil {
+				fmt.Println(cmd + ": command not found")
+			}
+
 		}
 	}
 }
@@ -74,4 +81,14 @@ func isCommandExecutableInPath(cmd string) (string, bool) {
 		return "", false
 	}
 	return path, true
+}
+
+func executeCommand(cmd string, args []string) error {
+	c := exec.Command(cmd, args...)
+	c.Stdin = os.Stdin
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+
+	err := c.Run()
+	return err
 }
