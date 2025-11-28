@@ -15,7 +15,7 @@ var (
 	_ = os.Stdout
 )
 
-var builtIncommandList = []string{"echo", "exit", "type"}
+var builtIncommandList = []string{"echo", "exit", "type", "pwd"}
 
 func main() {
 	for {
@@ -65,6 +65,10 @@ func handleCommands(cmd string, args []string) {
 		executeExitCommand(cmd, args)
 	case "echo":
 		executeEchoCommand(cmd, args)
+	case "pwd":
+
+		dir, _ := os.Getwd()
+		fmt.Println(dir)
 	case "type":
 		executeTypeCommand(cmd, args)
 	default:
